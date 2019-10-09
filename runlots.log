@@ -1,0 +1,1006 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  M:\Projects\TomRea\2019-RO1\Stata\runlots.log
+  log type:  text
+ opened on:   7 Jul 2019, 21:12:47
+
+. 
+. * do FACTorialshell 25 28 1 0.030 0.025 0.13 0.15 0.17 0.168 0.188 0.208 0.02 339985 1000
+. 
+. * do FACTorialshell 25 28 1 0.0325 0.024 0.13 0.15 0.17 0.168 0.188 0.208 0.02 3999067 1000
+. 
+. *do FACTorialshell 25 28 1 0.033 0.021 0.13 0.15 0.17 0.168 0.188 0.208 0.02 1098266 1000
+. 
+. *do FACTorialshell 25 28 1 0.033 0.022 0.13 0.15 0.17 0.168 0.188 0.208 0.02 3900674 1000
+. 
+. *do FACTorialshell 25 28 1 0.0325 0.023 0.13 0.15 0.17 0.168 0.188 0.208 0.02 5522551 1000
+. 
+. *do FACTorialshell 25 28 1 0.034 0.022 0.13 0.15 0.17 0.168 0.188 0.208 0.02 3647508 1000
+. 
+. *do FACTorialshell 25 28 1 0.035 0.023 0.13 0.15 0.17 0.168 0.188 0.208 0.02 115462 1000
+. 
+. *do FACTorialshell 25 28 1 0.035 0.024 0.127 0.151 0.175 0.168 0.188 0.208 0.02 663091 1000
+. 
+. do FACTorialshell 25 28 1 0.036 0.025 0.126 0.151 0.175 0.168 0.188 0.208 0.02 488765 1000
+
+. 
+. **************************************************************************
+. *
+. * Program to try out power and sample size for FACT project
+. *
+. * this is the "shell" program for FACTorial.do 
+. *
+. *
+. * Author: Susanne May
+. * Date: 07/05/2019 
+. *
+. *
+. * this program requires input parameters, NOTE input parameter do not seem to work, directly code the values instead
+. *
+. *        1 = nperp number of observations per period (we assume 6 periods for each agency)
+. *            e.g. with 28 agencies, 6 periods and 25 observations per period the total is 4200
+. *        2 = na number of agencies
+. *        3 = add indicator for additive effect (1 yes, 0 no) 
+. *        4 = betaigel effect if igel if additive
+. *        5 = betarate effect of compression rate if additive
+. *        6 = betab120 background rate for anticipated lowest survival group (referent)
+. *        7 = betab110 survival rate for BVM with rate 110 if not additive
+. *        8 = betab100 survival rate for BVM with rate 100 if not additive
+. *        9 = betai120 survival rate for igel with rate 120 if not additive
+. *       10 = betai110 survival rate for igel with rate 110 if not additive
+. *       11 = betai100 survival rate for igel with rate 100 if not additive
+. *       12 = sigma1 variance for normally distributed random effect of cluster / agency
+. *       13 = random number seed
+. *       14 = number of replications 
+. *
+. *       . do FACTorial 25 28 1 0.038 0.02 0.13 0.15 0.17 0.168 0.188 0.208 0.03 539083 10000
+. *
+. * run this file once as 
+. *  
+. *    do FACTorial
+. *
+. * before running runlots.do
+. *
+. **************************************************************************
+. 
+.     display "Simulation started  $S_DATE   $S_TIME"
+Simulation started   7 Jul 2019   21:12:47
+
+.     
+.     clear
+
+.     use one
+
+.     replace nummer=1 in 1
+(1 real change made)
+
+.     save,replace
+file one.dta saved
+
+.     clear
+
+. 
+.     simulate     totaln=r(totaln)  ///
+>          mean120b=r(mean120b) ///
+>          sd120b=r(sd120b) ///
+>          mean110b=r(mean110b) ///
+>          sd110b=r(sd110b) ///
+>          mean100b=r(mean100b) ///
+>          sd100b=r(sd100b) ///
+>          mean120i=r(mean120i) ///
+>          sd120i=r(sd120i) ///
+>          mean110i=r(mean110i) ///
+>          sd110i=r(sd110i) ///
+>          mean100i=r(mean100i) ///
+>          sd100i=r(sd100i) ///
+>          meanb=r(meanb) ///
+>          meani=r(meani) ///
+>          mean100=r(mean100) ///
+>          mean110=r(mean110) ///
+>          mean120=r(mean120) ///
+>          glmbinb0=r(glmbinb0) ///
+>          glmbinbigel=r(glmbinbigel) ///
+>          glmbinb100=r(glmbinb100) ///
+>          glmbinb110=r(glmbinb110) ///
+>          glmbinbigelp=r(glmbinbigelp) ///
+>          glmbinb100p=r(glmbinb100p) ///
+>          glmbinb110p=r(glmbinb110p) ///
+>          glmbinb100110p=r(glmbinb100110p) ///
+>          glmbinbigelp05=r(glmbinbigelp05) ///
+>          glmbinb100p05=r(glmbinb100p05) ///
+>          glmbinb110p05=r(glmbinb110p05) ///
+>          glmbinb100110p05=r(glmbinb100110p05) ///
+>          mixb0=r(mixb0) ///
+>          mixbigel=r(mixbigel) ///
+>          mixb100=r(mixb100) ///
+>          mixb110=r(mixb110) ///
+>          mixbigelp=r(mixbigelp) ///
+>          mixb100p=r(mixb100p) ///
+>          mixb110p=r(mixb110p) ///
+>          mixb100110p=r(mixb100110p) ///
+>          mixbigelp05=r(mixbigelp05) ///
+>          mixb100p05=r(mixb100p05) ///
+>          mixb110p05=r(mixb110p05) ///
+>          mixb100110p05=r(mixb100110p05) ///
+>          geebinb0=r(geebinb0) ///
+>          geebinbigel=r(geebinbigel) ///
+>          geebinb100=r(geebinb100) ///
+>          geebinb110=r(geebinb110) ///
+>          geebinbigelp=r(geebinbigelp) ///
+>          geebinb100p=r(geebinb100p) ///
+>          geebinb110p=r(geebinb110p) ///
+>          geebinb100110p=r(geebinb100110p) ///
+>          geebinbigelp05=r(geebinbigelp05) ///
+>          geebinb100p05=r(geebinb100p05) ///
+>          geebinb110p05=r(geebinb110p05) ///
+>          geebinb100110p05=r(geebinb100110p05) ///
+>          geelinb0=r(geelinb0) ///
+>          geelinbigel=r(geelinbigel) ///
+>          geelinb100=r(geelinb100) ///
+>          geelinb110=r(geelinb110) ///
+>          geelinbigelp=r(geelinbigelp) ///
+>          geelinb100p=r(geelinb100p) ///
+>          geelinb110p=r(geelinb110p) ///
+>          geelinb100110p=r(geelinb100110p) ///
+>          geelinbigelp05=r(geelinbigelp05) ///
+>          geelinb100p05=r(geelinb100p05) ///
+>          geelinb110p05=r(geelinb110p05) ///
+>          geelinb100110p05=r(geelinb100110p05) ///
+>          regb0=r(regb0) ///
+>          regbigel=r(regbigel) ///
+>          regb100=r(regb100) ///
+>          regb110=r(regb110) ///
+>          regbigelp=r(regbigelp) ///
+>          regb100p=r(regb100p) ///
+>          regb110p=r(regb110p) ///
+>          regb100110p=r(regb100110p) ///
+>          regbigelp05=r(regbigelp05) ///
+>          regb100p05=r(regb100p05) ///
+>          regb110p05=r(regb110p05) ///
+>          regb100110p05=r(regb100110p05) ///
+>          logitb0=r(logitb0) ///
+>          logitbigel=r(logitbigel) ///
+>          logitb100=r(logitb100) ///
+>          logitb110=r(logitb110) ///
+>          logitbigelp=r(logitbigelp) ///
+>          logitb100p=r(logitb100p) ///
+>          logitb110p=r(logitb110p) ///
+>          logitb100110p=r(logitb100110p) ///
+>          logitbigelp05=r(logitbigelp05) ///
+>          logitb100p05=r(logitb100p05) ///
+>          logitb110p05=r(logitb110p05) ///
+>          logitb100110p05=r(logitb100110p05) ///
+>          glmmixigeldiff=r(glmmixigeldiff) ///
+>          glmgeebinigeldiff=r(glmgeebinigeldiff) ///
+>          glmmgeelinigeldiff=r(glmmgeelinigeldiff) ///
+>          glmregigeldiff=r(glmregigeldiff) ///
+>             , reps(`14'): simula, nperp(`1') na(`2') add(`3') betaigel(`4') betarate(`5') ///
+>             betab120(`6') betab110(`7') betab100(`8')  betai120(`9') betai110(`10') betai100(`11') sigma1(`12')  ///
+>             seed(`13')
+
+         command:  simula, nperp(25) na(28) add(1) betaigel(0.036) betarate(0.025) betab120(0.126) betab110(0.151) betab100(0.175) betai120(0.168) betai110(0.188)
+                       betai100(0.208) sigma1(0.02) seed(488765)
+          totaln:  r(totaln)
+        mean120b:  r(mean120b)
+          sd120b:  r(sd120b)
+        mean110b:  r(mean110b)
+          sd110b:  r(sd110b)
+        mean100b:  r(mean100b)
+          sd100b:  r(sd100b)
+        mean120i:  r(mean120i)
+          sd120i:  r(sd120i)
+        mean110i:  r(mean110i)
+          sd110i:  r(sd110i)
+        mean100i:  r(mean100i)
+          sd100i:  r(sd100i)
+           meanb:  r(meanb)
+           meani:  r(meani)
+         mean100:  r(mean100)
+         mean110:  r(mean110)
+         mean120:  r(mean120)
+        glmbinb0:  r(glmbinb0)
+     glmbinbigel:  r(glmbinbigel)
+      glmbinb100:  r(glmbinb100)
+      glmbinb110:  r(glmbinb110)
+    glmbinbigelp:  r(glmbinbigelp)
+     glmbinb100p:  r(glmbinb100p)
+     glmbinb110p:  r(glmbinb110p)
+  glmbinb100110p:  r(glmbinb100110p)
+  glmbinbigelp05:  r(glmbinbigelp05)
+   glmbinb100p05:  r(glmbinb100p05)
+   glmbinb110p05:  r(glmbinb110p05)
+glmbinb100110p05:  r(glmbinb100110p05)
+           mixb0:  r(mixb0)
+        mixbigel:  r(mixbigel)
+         mixb100:  r(mixb100)
+         mixb110:  r(mixb110)
+       mixbigelp:  r(mixbigelp)
+        mixb100p:  r(mixb100p)
+        mixb110p:  r(mixb110p)
+     mixb100110p:  r(mixb100110p)
+     mixbigelp05:  r(mixbigelp05)
+      mixb100p05:  r(mixb100p05)
+      mixb110p05:  r(mixb110p05)
+   mixb100110p05:  r(mixb100110p05)
+        geebinb0:  r(geebinb0)
+     geebinbigel:  r(geebinbigel)
+      geebinb100:  r(geebinb100)
+      geebinb110:  r(geebinb110)
+    geebinbigelp:  r(geebinbigelp)
+     geebinb100p:  r(geebinb100p)
+     geebinb110p:  r(geebinb110p)
+  geebinb100110p:  r(geebinb100110p)
+  geebinbigelp05:  r(geebinbigelp05)
+   geebinb100p05:  r(geebinb100p05)
+   geebinb110p05:  r(geebinb110p05)
+geebinb100110p05:  r(geebinb100110p05)
+        geelinb0:  r(geelinb0)
+     geelinbigel:  r(geelinbigel)
+      geelinb100:  r(geelinb100)
+      geelinb110:  r(geelinb110)
+    geelinbigelp:  r(geelinbigelp)
+     geelinb100p:  r(geelinb100p)
+     geelinb110p:  r(geelinb110p)
+  geelinb100110p:  r(geelinb100110p)
+  geelinbigelp05:  r(geelinbigelp05)
+   geelinb100p05:  r(geelinb100p05)
+   geelinb110p05:  r(geelinb110p05)
+geelinb100110p05:  r(geelinb100110p05)
+           regb0:  r(regb0)
+        regbigel:  r(regbigel)
+         regb100:  r(regb100)
+         regb110:  r(regb110)
+       regbigelp:  r(regbigelp)
+        regb100p:  r(regb100p)
+        regb110p:  r(regb110p)
+     regb100110p:  r(regb100110p)
+     regbigelp05:  r(regbigelp05)
+      regb100p05:  r(regb100p05)
+      regb110p05:  r(regb110p05)
+   regb100110p05:  r(regb100110p05)
+         logitb0:  r(logitb0)
+      logitbigel:  r(logitbigel)
+       logitb100:  r(logitb100)
+       logitb110:  r(logitb110)
+     logitbigelp:  r(logitbigelp)
+      logitb100p:  r(logitb100p)
+      logitb110p:  r(logitb110p)
+   logitb100110p:  r(logitb100110p)
+   logitbigelp05:  r(logitbigelp05)
+    logitb100p05:  r(logitb100p05)
+    logitb110p05:  r(logitb110p05)
+ logitb100110p05:  r(logitb100110p05)
+  glmmixigeldiff:  r(glmmixigeldiff)
+glmgeebinigeld~f:  r(glmgeebinigeldiff)
+glmmgeelinigel~f:  r(glmmgeelinigeldiff)
+  glmregigeldiff:  r(glmregigeldiff)
+
+Simulations (1000)
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5 
+..................................................    50
+..................................................   100
+..................................................   150
+..................................................   200
+..................................................   250
+..................................................   300
+..................................................   350
+..................................................   400
+..................................................   450
+..................................................   500
+..................................................   550
+..................................................   600
+..................................................   650
+..................................................   700
+..................................................   750
+..................................................   800
+..................................................   850
+..................................................   900
+..................................................   950
+..................................................  1000
+
+. 
+. ***
+.     display "Program was run as: do FACTorialshell `*'"
+Program was run as: do FACTorialshell 25 28 1 0.036 0.025 0.126 0.151 0.175 0.168 0.188 0.208 0.02 488765 1000
+
+.     display "with arguments: nperp na add betaigel betarate betab120 beatb110 betab100 beai120 betai110 betai100 sigma1 seed"
+with arguments: nperp na add betaigel betarate betab120 beatb110 betab100 beai120 betai110 betai100 sigma1 seed
+
+.     sum totaln mean120b mean110b mean100b mean120i mean110i mean100i  sd120b sd110b sd100b sd120i sd110i sd100i
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+      totaln |      1,000        4200           0       4200       4200
+    mean120b |      1,000     .126239    .0141626   .0842857   .1692308
+    mean110b |      1,000    .1513423    .0142552   .1046154   .1911111
+    mean100b |      1,000    .1763099    .0154023       .112   .2295652
+    mean120i |      1,000    .1622076    .0150543        .12      .2096
+-------------+---------------------------------------------------------
+    mean110i |      1,000    .1869483    .0151938      .1392        .24
+    mean100i |      1,000    .2114853    .0164817     .16375   .2608696
+      sd120b |      1,000    .3316715    .0160172   .2780145   .3752444
+      sd110b |      1,000    .3580869    .0139111   .3062929   .3934679
+      sd100b |      1,000    .3808245    .0131266   .3155769   .4209194
+-------------+---------------------------------------------------------
+      sd120i |      1,000     .368342    .0138127   .3251939   .4073491
+      sd110i |      1,000    .3896651    .0122979   .3464324   .4274395
+      sd100i |      1,000    .4081563    .0116832   .3702801   .4394912
+
+.     sum glmbinb0-glmbinb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    glmbinb0 |      1,000    .1264051    .0121281   .0879149   .1663826
+ glmbinbigel |      1,000    .0356146     .011924  -.0015678   .0733496
+  glmbinb100 |      1,000    .0496798    .0140247  -.0003224   .0900714
+  glmbinb110 |      1,000    .0249482    .0138102  -.0206123   .0708066
+glmbinbigelp |      1,000    .0328458    .0955504   4.20e-16   .8852859
+-------------+---------------------------------------------------------
+ glmbinb100p |      1,000    .0138919     .055879   5.13e-15   .9787068
+ glmbinb110p |      1,000      .17663     .236965   1.78e-08   .9973777
+glmb~100110p |      1,000    .0207989    .0695462   8.64e-15   .8928344
+glmbinbig~05 |      1,000        .867    .3397446          0          1
+glmbin~00p05 |      1,000        .943    .2319586          0          1
+-------------+---------------------------------------------------------
+glmbinb11~05 |      1,000        .459    .4985655          0          1
+glmb~0110p05 |      1,000        .896    .3054133          0          1
+
+.     sum mixb0-mixb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+       mixb0 |      1,000    .1264375    .0121468   .0871652   .1666042
+    mixbigel |      1,000     .035578    .0119837  -.0020952   .0736177
+     mixb100 |      1,000    .0496585    .0140636  -.0010257   .0897128
+     mixb110 |      1,000      .02493     .013849  -.0208689   .0719319
+   mixbigelp |      1,000    .0338499    .0978355   9.70e-16   .8502024
+-------------+---------------------------------------------------------
+    mixb100p |      1,000    .0142679    .0558949   1.96e-14   .9336739
+    mixb110p |      1,000     .178509    .2396425   3.58e-08          1
+ mixb100110p |      1,000    .0215814    .0700863   1.21e-14   .8852465
+ mixbigelp05 |      1,000        .862    .3450726          0          1
+  mixb100p05 |      1,000        .936    .2448754          0          1
+-------------+---------------------------------------------------------
+  mixb110p05 |      1,000         .47    .4993489          0          1
+mixb10011~05 |      1,000          .9    .3001501          0          1
+
+.     sum geebinb0-geebinb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    geebinb0 |      1,000    .1264085    .0121259   .0879157   .1663831
+ geebinbigel |      1,000    .0356106    .0119208  -.0015801   .0733515
+  geebinb100 |      1,000    .0496755    .0140259  -.0003227   .0900743
+  geebinb110 |      1,000    .0249472    .0138065  -.0206102   .0709285
+geebinbigelp |      1,000    .0334371    .0962401   8.01e-11   .8901523
+-------------+---------------------------------------------------------
+ geebinb100p |      1,000    .0134126     .055937   3.84e-11   .9820005
+ geebinb110p |      1,000    .1788097    .2365282   8.47e-08   .9984127
+geeb~100110p |      1,000    .0216412    .0684806   3.53e-12   .8743598
+geebinbig~05 |      1,000        .858    .3492248          0          1
+geebin~00p05 |      1,000         .94    .2376057          0          1
+-------------+---------------------------------------------------------
+geebinb11~05 |      1,000        .458    .4984822          0          1
+geeb~0110p05 |      1,000        .898    .3027997          0          1
+
+.     sum geelinb0-geelinb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    geelinb0 |      1,000    .1264375    .0121468   .0871652   .1666042
+ geelinbigel |      1,000     .035578    .0119837  -.0020952   .0736177
+  geelinb100 |      1,000    .0496585    .0140636  -.0010257   .0897128
+  geelinb110 |      1,000      .02493     .013849  -.0208689   .0719319
+geelinbigelp |      1,000    .0338499    .0978355   9.70e-16   .8502024
+-------------+---------------------------------------------------------
+ geelinb100p |      1,000    .0142679    .0558949   1.96e-14   .9336739
+ geelinb110p |      1,000     .178509    .2396425   3.58e-08          1
+geel~100110p |      1,000    .0215814    .0700863   1.21e-14   .8852465
+geelinbig~05 |      1,000        .862    .3450726          0          1
+geelin~00p05 |      1,000        .936    .2448754          0          1
+-------------+---------------------------------------------------------
+geelinb11~05 |      1,000         .47    .4993489          0          1
+geel~0110p05 |      1,000          .9    .3001501          0          1
+
+.     sum regb0-regb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+       regb0 |      1,000    .1264375    .0121468   .0871652   .1666042
+    regbigel |      1,000     .035578    .0119837  -.0020952   .0736177
+     regb100 |      1,000    .0496585    .0140636  -.0010257   .0897128
+     regb110 |      1,000      .02493     .013849  -.0208689   .0719319
+   regbigelp |      1,000    .0346537      .09854   1.13e-10   .8558321
+-------------+---------------------------------------------------------
+    regb100p |      1,000    .0139161    .0561135   4.79e-11   .9430854
+    regb110p |      1,000    .1813767    .2393867   6.16e-08          1
+ regb100110p |      1,000     .022606    .0697101   3.38e-12   .8669469
+ regbigelp05 |      1,000         .86    .3471607          0          1
+  regb100p05 |      1,000        .939    .2394501          0          1
+-------------+---------------------------------------------------------
+  regb110p05 |      1,000        .454    .4981286          0          1
+regb10011~05 |      1,000        .891    .3117952          0          1
+
+.     sum logitb0-logitb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+     logitb0 |      1,000   -1.924993    .1012932  -2.277572  -1.609721
+  logitbigel |      1,000    .2563233    .0871666  -.0151602   .5447571
+   logitb100 |      1,000    .3587563    .1031545  -.0071255   .7095464
+   logitb110 |      1,000    .1909624    .1070102  -.1565745   .5925114
+ logitbigelp |      1,000    .0344622    .0977545   1.69e-10   .8574194
+-------------+---------------------------------------------------------
+  logitb100p |      1,000    .0137991     .055783   8.40e-11   .9434217
+  logitb110p |      1,000     .181119    .2390359   8.60e-08   .9992844
+logi~100110p |      1,000    .0224678    .0693925   1.51e-10   .8652891
+logitbige~05 |      1,000        .858    .3492248          0          1
+logitb100p05 |      1,000        .939    .2394501          0          1
+-------------+---------------------------------------------------------
+logitb110p05 |      1,000        .455    .4982201          0          1
+logitb1001~5 |      1,000         .89    .3130463          0          1
+
+.     sum glmmixigeldiff-glmregigeldiff
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+glmmixigel~f |      1,000    .0000367    .0012779  -.0045205   .0047106
+glmgeebini~f |      1,000    3.97e-06    .0001115  -.0006296   .0008807
+glmmgeelin~f |      1,000    .0000367    .0012779  -.0045205   .0047106
+glmregigel~f |      1,000    .0000367    .0012779  -.0045205   .0047106
+
+.     sum glmbinbigel mixbigel geebinbigel geelinbigel regbigel
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ glmbinbigel |      1,000    .0356146     .011924  -.0015678   .0733496
+    mixbigel |      1,000     .035578    .0119837  -.0020952   .0736177
+ geebinbigel |      1,000    .0356106    .0119208  -.0015801   .0733515
+ geelinbigel |      1,000     .035578    .0119837  -.0020952   .0736177
+    regbigel |      1,000     .035578    .0119837  -.0020952   .0736177
+
+.     sum meanb meani mean100 mean110 mean120
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+       meanb |      1,000    .1512214    .0092154   .1214286   .1809524
+       meani |      1,000    .1869571    .0094595   .1552381   .2195238
+     mean100 |      1,000    .1940107    .0113987   .1464286   .2278571
+     mean110 |      1,000    .1689943    .0105238   .1385714   .2078571
+     mean120 |      1,000    .1442629    .0109451   .1092857   .1735714
+
+.     sum glmbinb100110p05 mixb100110p05 geebinb100110p05 geelinb100110p05 regb100110p05 logitb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+glmb~0110p05 |      1,000        .896    .3054133          0          1
+mixb10011~05 |      1,000          .9    .3001501          0          1
+geeb~0110p05 |      1,000        .898    .3027997          0          1
+geel~0110p05 |      1,000          .9    .3001501          0          1
+regb10011~05 |      1,000        .891    .3117952          0          1
+-------------+---------------------------------------------------------
+logitb1001~5 |      1,000         .89    .3130463          0          1
+
+.     sum glmbinbigelp05 mixbigelp05 geebinbigelp05 geelinbigelp05 regbigelp05 logitbigelp05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+glmbinbig~05 |      1,000        .867    .3397446          0          1
+ mixbigelp05 |      1,000        .862    .3450726          0          1
+geebinbig~05 |      1,000        .858    .3492248          0          1
+geelinbig~05 |      1,000        .862    .3450726          0          1
+ regbigelp05 |      1,000         .86    .3471607          0          1
+-------------+---------------------------------------------------------
+logitbige~05 |      1,000        .858    .3492248          0          1
+
+.     
+.     capture save results.dta, replace
+
+. 
+.     display "Simulation ended  $S_DATE   $S_TIME"
+Simulation ended   7 Jul 2019   21:32:12
+
+.     
+.     
+. 
+. 
+. 
+. 
+end of do-file
+
+. 
+. do FACTorialshell 25 28 1 0.037 0.026 0.125 0.151 0.175 0.168 0.188 0.208 0.02 334001 1000
+
+. 
+. **************************************************************************
+. *
+. * Program to try out power and sample size for FACT project
+. *
+. * this is the "shell" program for FACTorial.do 
+. *
+. *
+. * Author: Susanne May
+. * Date: 07/05/2019 
+. *
+. *
+. * this program requires input parameters, NOTE input parameter do not seem to work, directly code the values instead
+. *
+. *        1 = nperp number of observations per period (we assume 6 periods for each agency)
+. *            e.g. with 28 agencies, 6 periods and 25 observations per period the total is 4200
+. *        2 = na number of agencies
+. *        3 = add indicator for additive effect (1 yes, 0 no) 
+. *        4 = betaigel effect if igel if additive
+. *        5 = betarate effect of compression rate if additive
+. *        6 = betab120 background rate for anticipated lowest survival group (referent)
+. *        7 = betab110 survival rate for BVM with rate 110 if not additive
+. *        8 = betab100 survival rate for BVM with rate 100 if not additive
+. *        9 = betai120 survival rate for igel with rate 120 if not additive
+. *       10 = betai110 survival rate for igel with rate 110 if not additive
+. *       11 = betai100 survival rate for igel with rate 100 if not additive
+. *       12 = sigma1 variance for normally distributed random effect of cluster / agency
+. *       13 = random number seed
+. *       14 = number of replications 
+. *
+. *       . do FACTorial 25 28 1 0.038 0.02 0.13 0.15 0.17 0.168 0.188 0.208 0.03 539083 10000
+. *
+. * run this file once as 
+. *  
+. *    do FACTorial
+. *
+. * before running runlots.do
+. *
+. **************************************************************************
+. 
+.     display "Simulation started  $S_DATE   $S_TIME"
+Simulation started   7 Jul 2019   21:32:12
+
+.     
+.     clear
+
+.     use one
+
+.     replace nummer=1 in 1
+(1 real change made)
+
+.     save,replace
+file one.dta saved
+
+.     clear
+
+. 
+.     simulate     totaln=r(totaln)  ///
+>          mean120b=r(mean120b) ///
+>          sd120b=r(sd120b) ///
+>          mean110b=r(mean110b) ///
+>          sd110b=r(sd110b) ///
+>          mean100b=r(mean100b) ///
+>          sd100b=r(sd100b) ///
+>          mean120i=r(mean120i) ///
+>          sd120i=r(sd120i) ///
+>          mean110i=r(mean110i) ///
+>          sd110i=r(sd110i) ///
+>          mean100i=r(mean100i) ///
+>          sd100i=r(sd100i) ///
+>          meanb=r(meanb) ///
+>          meani=r(meani) ///
+>          mean100=r(mean100) ///
+>          mean110=r(mean110) ///
+>          mean120=r(mean120) ///
+>          glmbinb0=r(glmbinb0) ///
+>          glmbinbigel=r(glmbinbigel) ///
+>          glmbinb100=r(glmbinb100) ///
+>          glmbinb110=r(glmbinb110) ///
+>          glmbinbigelp=r(glmbinbigelp) ///
+>          glmbinb100p=r(glmbinb100p) ///
+>          glmbinb110p=r(glmbinb110p) ///
+>          glmbinb100110p=r(glmbinb100110p) ///
+>          glmbinbigelp05=r(glmbinbigelp05) ///
+>          glmbinb100p05=r(glmbinb100p05) ///
+>          glmbinb110p05=r(glmbinb110p05) ///
+>          glmbinb100110p05=r(glmbinb100110p05) ///
+>          mixb0=r(mixb0) ///
+>          mixbigel=r(mixbigel) ///
+>          mixb100=r(mixb100) ///
+>          mixb110=r(mixb110) ///
+>          mixbigelp=r(mixbigelp) ///
+>          mixb100p=r(mixb100p) ///
+>          mixb110p=r(mixb110p) ///
+>          mixb100110p=r(mixb100110p) ///
+>          mixbigelp05=r(mixbigelp05) ///
+>          mixb100p05=r(mixb100p05) ///
+>          mixb110p05=r(mixb110p05) ///
+>          mixb100110p05=r(mixb100110p05) ///
+>          geebinb0=r(geebinb0) ///
+>          geebinbigel=r(geebinbigel) ///
+>          geebinb100=r(geebinb100) ///
+>          geebinb110=r(geebinb110) ///
+>          geebinbigelp=r(geebinbigelp) ///
+>          geebinb100p=r(geebinb100p) ///
+>          geebinb110p=r(geebinb110p) ///
+>          geebinb100110p=r(geebinb100110p) ///
+>          geebinbigelp05=r(geebinbigelp05) ///
+>          geebinb100p05=r(geebinb100p05) ///
+>          geebinb110p05=r(geebinb110p05) ///
+>          geebinb100110p05=r(geebinb100110p05) ///
+>          geelinb0=r(geelinb0) ///
+>          geelinbigel=r(geelinbigel) ///
+>          geelinb100=r(geelinb100) ///
+>          geelinb110=r(geelinb110) ///
+>          geelinbigelp=r(geelinbigelp) ///
+>          geelinb100p=r(geelinb100p) ///
+>          geelinb110p=r(geelinb110p) ///
+>          geelinb100110p=r(geelinb100110p) ///
+>          geelinbigelp05=r(geelinbigelp05) ///
+>          geelinb100p05=r(geelinb100p05) ///
+>          geelinb110p05=r(geelinb110p05) ///
+>          geelinb100110p05=r(geelinb100110p05) ///
+>          regb0=r(regb0) ///
+>          regbigel=r(regbigel) ///
+>          regb100=r(regb100) ///
+>          regb110=r(regb110) ///
+>          regbigelp=r(regbigelp) ///
+>          regb100p=r(regb100p) ///
+>          regb110p=r(regb110p) ///
+>          regb100110p=r(regb100110p) ///
+>          regbigelp05=r(regbigelp05) ///
+>          regb100p05=r(regb100p05) ///
+>          regb110p05=r(regb110p05) ///
+>          regb100110p05=r(regb100110p05) ///
+>          logitb0=r(logitb0) ///
+>          logitbigel=r(logitbigel) ///
+>          logitb100=r(logitb100) ///
+>          logitb110=r(logitb110) ///
+>          logitbigelp=r(logitbigelp) ///
+>          logitb100p=r(logitb100p) ///
+>          logitb110p=r(logitb110p) ///
+>          logitb100110p=r(logitb100110p) ///
+>          logitbigelp05=r(logitbigelp05) ///
+>          logitb100p05=r(logitb100p05) ///
+>          logitb110p05=r(logitb110p05) ///
+>          logitb100110p05=r(logitb100110p05) ///
+>          glmmixigeldiff=r(glmmixigeldiff) ///
+>          glmgeebinigeldiff=r(glmgeebinigeldiff) ///
+>          glmmgeelinigeldiff=r(glmmgeelinigeldiff) ///
+>          glmregigeldiff=r(glmregigeldiff) ///
+>             , reps(`14'): simula, nperp(`1') na(`2') add(`3') betaigel(`4') betarate(`5') ///
+>             betab120(`6') betab110(`7') betab100(`8')  betai120(`9') betai110(`10') betai100(`11') sigma1(`12')  ///
+>             seed(`13')
+
+         command:  simula, nperp(25) na(28) add(1) betaigel(0.037) betarate(0.026) betab120(0.125) betab110(0.151) betab100(0.175) betai120(0.168) betai110(0.188)
+                       betai100(0.208) sigma1(0.02) seed(334001)
+          totaln:  r(totaln)
+        mean120b:  r(mean120b)
+          sd120b:  r(sd120b)
+        mean110b:  r(mean110b)
+          sd110b:  r(sd110b)
+        mean100b:  r(mean100b)
+          sd100b:  r(sd100b)
+        mean120i:  r(mean120i)
+          sd120i:  r(sd120i)
+        mean110i:  r(mean110i)
+          sd110i:  r(sd110i)
+        mean100i:  r(mean100i)
+          sd100i:  r(sd100i)
+           meanb:  r(meanb)
+           meani:  r(meani)
+         mean100:  r(mean100)
+         mean110:  r(mean110)
+         mean120:  r(mean120)
+        glmbinb0:  r(glmbinb0)
+     glmbinbigel:  r(glmbinbigel)
+      glmbinb100:  r(glmbinb100)
+      glmbinb110:  r(glmbinb110)
+    glmbinbigelp:  r(glmbinbigelp)
+     glmbinb100p:  r(glmbinb100p)
+     glmbinb110p:  r(glmbinb110p)
+  glmbinb100110p:  r(glmbinb100110p)
+  glmbinbigelp05:  r(glmbinbigelp05)
+   glmbinb100p05:  r(glmbinb100p05)
+   glmbinb110p05:  r(glmbinb110p05)
+glmbinb100110p05:  r(glmbinb100110p05)
+           mixb0:  r(mixb0)
+        mixbigel:  r(mixbigel)
+         mixb100:  r(mixb100)
+         mixb110:  r(mixb110)
+       mixbigelp:  r(mixbigelp)
+        mixb100p:  r(mixb100p)
+        mixb110p:  r(mixb110p)
+     mixb100110p:  r(mixb100110p)
+     mixbigelp05:  r(mixbigelp05)
+      mixb100p05:  r(mixb100p05)
+      mixb110p05:  r(mixb110p05)
+   mixb100110p05:  r(mixb100110p05)
+        geebinb0:  r(geebinb0)
+     geebinbigel:  r(geebinbigel)
+      geebinb100:  r(geebinb100)
+      geebinb110:  r(geebinb110)
+    geebinbigelp:  r(geebinbigelp)
+     geebinb100p:  r(geebinb100p)
+     geebinb110p:  r(geebinb110p)
+  geebinb100110p:  r(geebinb100110p)
+  geebinbigelp05:  r(geebinbigelp05)
+   geebinb100p05:  r(geebinb100p05)
+   geebinb110p05:  r(geebinb110p05)
+geebinb100110p05:  r(geebinb100110p05)
+        geelinb0:  r(geelinb0)
+     geelinbigel:  r(geelinbigel)
+      geelinb100:  r(geelinb100)
+      geelinb110:  r(geelinb110)
+    geelinbigelp:  r(geelinbigelp)
+     geelinb100p:  r(geelinb100p)
+     geelinb110p:  r(geelinb110p)
+  geelinb100110p:  r(geelinb100110p)
+  geelinbigelp05:  r(geelinbigelp05)
+   geelinb100p05:  r(geelinb100p05)
+   geelinb110p05:  r(geelinb110p05)
+geelinb100110p05:  r(geelinb100110p05)
+           regb0:  r(regb0)
+        regbigel:  r(regbigel)
+         regb100:  r(regb100)
+         regb110:  r(regb110)
+       regbigelp:  r(regbigelp)
+        regb100p:  r(regb100p)
+        regb110p:  r(regb110p)
+     regb100110p:  r(regb100110p)
+     regbigelp05:  r(regbigelp05)
+      regb100p05:  r(regb100p05)
+      regb110p05:  r(regb110p05)
+   regb100110p05:  r(regb100110p05)
+         logitb0:  r(logitb0)
+      logitbigel:  r(logitbigel)
+       logitb100:  r(logitb100)
+       logitb110:  r(logitb110)
+     logitbigelp:  r(logitbigelp)
+      logitb100p:  r(logitb100p)
+      logitb110p:  r(logitb110p)
+   logitb100110p:  r(logitb100110p)
+   logitbigelp05:  r(logitbigelp05)
+    logitb100p05:  r(logitb100p05)
+    logitb110p05:  r(logitb110p05)
+ logitb100110p05:  r(logitb100110p05)
+  glmmixigeldiff:  r(glmmixigeldiff)
+glmgeebinigeld~f:  r(glmgeebinigeldiff)
+glmmgeelinigel~f:  r(glmmgeelinigeldiff)
+  glmregigeldiff:  r(glmregigeldiff)
+
+Simulations (1000)
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5 
+..................................................    50
+..................................................   100
+..................................................   150
+..................................................   200
+..................................................   250
+..................................................   300
+..................................................   350
+..................................................   400
+..................................................   450
+..................................................   500
+..................................................   550
+..................................................   600
+..................................................   650
+..................................................   700
+..................................................   750
+..................................................   800
+..................................................   850
+..................................................   900
+..................................................   950
+..................................................  1000
+
+. 
+. ***
+.     display "Program was run as: do FACTorialshell `*'"
+Program was run as: do FACTorialshell 25 28 1 0.037 0.026 0.125 0.151 0.175 0.168 0.188 0.208 0.02 334001 1000
+
+.     display "with arguments: nperp na add betaigel betarate betab120 beatb110 betab100 beai120 betai110 betai100 sigma1 seed"
+with arguments: nperp na add betaigel betarate betab120 beatb110 betab100 beai120 betai110 betai100 sigma1 seed
+
+.     sum totaln mean120b mean110b mean100b mean120i mean110i mean100i  sd120b sd110b sd100b sd120i sd110i sd100i
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+      totaln |      1,000        4200           0       4200       4200
+    mean120b |      1,000    .1253688    .0131787   .0785714       .168
+    mean110b |      1,000    .1509617    .0138656   .1075862   .2025806
+    mean100b |      1,000    .1772081    .0152574   .1321739   .2228571
+    mean120i |      1,000    .1614792    .0139296   .1148387   .2068966
+-------------+---------------------------------------------------------
+    mean110i |      1,000    .1886231    .0152577   .1416667   .2466667
+    mean100i |      1,000    .2139886    .0166131       .162   .2868966
+      sd120b |      1,000    .3307776    .0149741   .2692611   .3742407
+      sd110b |      1,000    .3577425    .0136162    .310071   .4021821
+      sd100b |      1,000    .3815974    .0129394   .3389746   .4164608
+-------------+---------------------------------------------------------
+      sd120i |      1,000    .3677508    .0128224   .3190331   .4053603
+      sd110i |      1,000    .3910074    .0121672   .3489989   .4313587
+      sd100i |      1,000    .4099149    .0116407   .3688198   .4526251
+
+.     sum glmbinb0-glmbinb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    glmbinb0 |      1,000    .1250847    .0108784   .0929528   .1612625
+ glmbinbigel |      1,000    .0368236     .011509   .0028193   .0706844
+  glmbinb100 |      1,000    .0520867     .013801   .0054082   .0898324
+  glmbinb110 |      1,000     .026252    .0130338  -.0154857   .0673304
+glmbinbigelp |      1,000     .022419    .0690818   2.61e-12   .8196716
+-------------+---------------------------------------------------------
+ glmbinb100p |      1,000    .0091127    .0398462   1.89e-17   .7299913
+ glmbinb110p |      1,000    .1535554    .2169563   3.22e-09   .9931399
+glmb~100110p |      1,000    .0155803    .0532405   2.64e-20   .7047125
+glmbinbig~05 |      1,000        .894    .3079917          0          1
+glmbin~00p05 |      1,000        .958    .2006895          0          1
+-------------+---------------------------------------------------------
+glmbinb11~05 |      1,000        .488    .5001061          0          1
+glmb~0110p05 |      1,000        .919    .2729716          0          1
+
+.     sum mixb0-mixb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+       mixb0 |      1,000    .1250352    .0109494   .0891284   .1612817
+    mixbigel |      1,000    .0368542    .0115922   .0001597   .0712191
+     mixb100 |      1,000    .0521215     .013885   .0048294   .0938859
+     mixb110 |      1,000    .0263173    .0130648  -.0168999   .0691094
+   mixbigelp |      1,000    .0229181    .0716198   7.14e-15   .9896375
+-------------+---------------------------------------------------------
+    mixb100p |      1,000    .0096857    .0424919   1.06e-16   .7714291
+    mixb110p |      1,000    .1531497    .2143945   6.98e-09          1
+ mixb100110p |      1,000    .0158382    .0538657   9.65e-19   .6935269
+ mixbigelp05 |      1,000        .886    .3179703          0          1
+  mixb100p05 |      1,000        .956    .2051977          0          1
+-------------+---------------------------------------------------------
+  mixb110p05 |      1,000         .49    .5001501          0          1
+mixb10011~05 |      1,000        .915    .2790212          0          1
+
+.     sum geebinb0-geebinb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    geebinb0 |      1,000    .1250859    .0108745   .0926748   .1613884
+ geebinbigel |      1,000    .0368217    .0115022   .0028246   .0706698
+  geebinb100 |      1,000    .0520831    .0138035   .0053808   .0897973
+  geebinb110 |      1,000    .0262559    .0130321  -.0155938   .0673135
+geebinbigelp |      1,000    .0225086    .0692306   1.22e-09   .8053921
+-------------+---------------------------------------------------------
+ geebinb100p |      1,000    .0078803    .0360482   2.85e-10   .6930982
+ geebinb110p |      1,000    .1532964     .214481   4.08e-07   .9814458
+geeb~100110p |      1,000    .0145529    .0495863   1.77e-10   .6515192
+geebinbig~05 |      1,000        .899    .3014795          0          1
+geebin~00p05 |      1,000         .96    .1960572          0          1
+-------------+---------------------------------------------------------
+geebinb11~05 |      1,000        .476    .4996736          0          1
+geeb~0110p05 |      1,000        .928    .2586173          0          1
+
+.     sum geelinb0-geelinb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    geelinb0 |      1,000    .1250352    .0109494   .0891284   .1612817
+ geelinbigel |      1,000    .0368542    .0115922   .0001597   .0712191
+  geelinb100 |      1,000    .0521215     .013885   .0048294   .0938859
+  geelinb110 |      1,000    .0263173    .0130648  -.0168999   .0691094
+geelinbigelp |      1,000    .0229181    .0716198   7.14e-15   .9896375
+-------------+---------------------------------------------------------
+ geelinb100p |      1,000    .0096857    .0424919   1.06e-16   .7714291
+ geelinb110p |      1,000    .1531497    .2143945   6.98e-09          1
+geel~100110p |      1,000    .0158382    .0538657   9.65e-19   .6935269
+geelinbig~05 |      1,000        .886    .3179703          0          1
+geelin~00p05 |      1,000        .956    .2051977          0          1
+-------------+---------------------------------------------------------
+geelinb11~05 |      1,000         .49    .5001501          0          1
+geel~0110p05 |      1,000        .915    .2790212          0          1
+
+.     sum regb0-regb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+       regb0 |      1,000    .1250352    .0109494   .0891284   .1612817
+    regbigel |      1,000    .0368542    .0115922   .0001597   .0712191
+     regb100 |      1,000    .0521215     .013885   .0048294   .0938859
+     regb110 |      1,000    .0263173    .0130648  -.0168999   .0691094
+   regbigelp |      1,000    .0232009    .0715686   1.71e-09   .9888169
+-------------+---------------------------------------------------------
+    regb100p |      1,000    .0083984    .0382318   5.02e-11   .7255685
+    regb110p |      1,000    .1536611    .2121149   2.86e-07          1
+ regb100110p |      1,000    .0151164    .0511416   3.06e-10   .6333252
+ regbigelp05 |      1,000        .886    .3179703          0          1
+  regb100p05 |      1,000         .96    .1960572          0          1
+-------------+---------------------------------------------------------
+  regb110p05 |      1,000        .477    .4997206          0          1
+regb10011~05 |      1,000        .927    .2602667          0          1
+
+.     sum logitb0-logitb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+     logitb0 |      1,000   -1.935007    .0919428  -2.273576  -1.659152
+  logitbigel |      1,000    .2648344    .0837765   .0013685   .5130908
+   logitb100 |      1,000    .3753613    .1000304   .0374718   .6628711
+   logitb110 |      1,000    .2008158    .1000715  -.1388202   .5495195
+ logitbigelp |      1,000    .0231773    .0715291   2.33e-09   .9873252
+-------------+---------------------------------------------------------
+  logitb100p |      1,000    .0083632    .0380447   1.06e-10   .7189172
+  logitb110p |      1,000    .1539069    .2125261   4.00e-07   .9967955
+logi~100110p |      1,000    .0153255    .0515509   7.45e-10   .6377913
+logitbige~05 |      1,000        .888    .3155243          0          1
+logitb100p05 |      1,000         .96    .1960572          0          1
+-------------+---------------------------------------------------------
+logitb110p05 |      1,000        .477    .4997206          0          1
+logitb1001~5 |      1,000        .928    .2586173          0          1
+
+.     sum glmmixigeldiff-glmregigeldiff
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+glmmixigel~f |      1,000   -.0000306    .0013405  -.0054525    .006125
+glmgeebini~f |      1,000    1.86e-06    .0001171  -.0005653   .0005529
+glmmgeelin~f |      1,000   -.0000306    .0013405  -.0054525    .006125
+glmregigel~f |      1,000   -.0000306    .0013405  -.0054525    .006125
+
+.     sum glmbinbigel mixbigel geebinbigel geelinbigel regbigel
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ glmbinbigel |      1,000    .0368236     .011509   .0028193   .0706844
+    mixbigel |      1,000    .0368542    .0115922   .0001597   .0712191
+ geebinbigel |      1,000    .0368217    .0115022   .0028246   .0706698
+ geelinbigel |      1,000    .0368542    .0115922   .0001597   .0712191
+    regbigel |      1,000    .0368542    .0115922   .0001597   .0712191
+
+.     sum meanb meani mean100 mean110 mean120
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+       meanb |      1,000     .151219    .0086644   .1209524   .1890476
+       meani |      1,000    .1879981    .0092273   .1566667   .2190476
+     mean100 |      1,000    .1955907    .0114886   .1607143   .2335714
+     mean110 |      1,000    .1696579    .0108209   .1342857   .2064286
+     mean120 |      1,000    .1435771    .0096527   .1085714   .1707143
+
+.     sum glmbinb100110p05 mixb100110p05 geebinb100110p05 geelinb100110p05 regb100110p05 logitb100110p05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+glmb~0110p05 |      1,000        .919    .2729716          0          1
+mixb10011~05 |      1,000        .915    .2790212          0          1
+geeb~0110p05 |      1,000        .928    .2586173          0          1
+geel~0110p05 |      1,000        .915    .2790212          0          1
+regb10011~05 |      1,000        .927    .2602667          0          1
+-------------+---------------------------------------------------------
+logitb1001~5 |      1,000        .928    .2586173          0          1
+
+.     sum glmbinbigelp05 mixbigelp05 geebinbigelp05 geelinbigelp05 regbigelp05 logitbigelp05
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+glmbinbig~05 |      1,000        .894    .3079917          0          1
+ mixbigelp05 |      1,000        .886    .3179703          0          1
+geebinbig~05 |      1,000        .899    .3014795          0          1
+geelinbig~05 |      1,000        .886    .3179703          0          1
+ regbigelp05 |      1,000        .886    .3179703          0          1
+-------------+---------------------------------------------------------
+logitbige~05 |      1,000        .888    .3155243          0          1
+
+.     
+.     capture save results.dta, replace
+
+. 
+.     display "Simulation ended  $S_DATE   $S_TIME"
+Simulation ended   7 Jul 2019   21:51:47
+
+.     
+.     
+. 
+. 
+. 
+. 
+end of do-file
+
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  M:\Projects\TomRea\2019-RO1\Stata\runlots.log
+  log type:  text
+ closed on:   7 Jul 2019, 21:51:47
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
